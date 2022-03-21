@@ -80,6 +80,11 @@ struct bd_info;
 #define MMC_MODE_1BIT		BIT(28)
 #define MMC_MODE_SPI		BIT(27)
 
+#define MMC_MODE_HC             0x800
+
+#define MMC_MODE_WIDTH_BITS_SHIFT 8
+#define MMC_MODE_LEGACY			0x000
+#define MMC_MODE_HSDDR_52MHz 	0x004
 
 #define SD_DATA_4BIT	0x00040000
 
@@ -249,6 +254,8 @@ static inline bool mmc_is_tuning_cmd(uint cmdidx)
  * EXT_CSD field definitions
  */
 
+#define MMC_CMD_AC	(0 << 5)
+
 #define EXT_CSD_CMD_SET_NORMAL		(1 << 0)
 #define EXT_CSD_CMD_SET_SECURE		(1 << 1)
 #define EXT_CSD_CMD_SET_CPSECURE	(1 << 2)
@@ -417,6 +424,7 @@ struct mmc_cmd {
 	uint resp_type;
 	uint cmdarg;
 	uint response[4];
+	u32 flags;
 };
 
 struct mmc_data {

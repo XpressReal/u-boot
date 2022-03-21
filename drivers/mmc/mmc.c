@@ -803,6 +803,10 @@ int mmc_send_ext_csd(struct mmc *mmc, u8 *ext_csd)
 
 	err = mmc_send_cmd(mmc, &cmd, &data);
 
+#ifdef MMC_DEBUG
+	mmc_show_ext_csd(ext_csd);
+#endif
+
 	return err;
 }
 
@@ -2495,6 +2499,9 @@ static int mmc_startup(struct mmc *mmc)
 		return err;
 
 	memcpy(mmc->cid, cmd.response, 16);
+#ifdef MMC_DEBUG
+	printf("[LY] cid[0]=0x%02x\n",mmc->cid[0]>>24);
+#endif
 
 	/*
 	 * For MMC cards, set the Relative Address.
@@ -2530,6 +2537,11 @@ static int mmc_startup(struct mmc *mmc)
 	mmc->csd[2] = cmd.response[2];
 	mmc->csd[3] = cmd.response[3];
 
+#ifdef MMC_DEBUG
+	mmc_show_csd(mmc);
+	mmc_decode_cid(mmc);
+#endif
+
 	if (mmc->version == MMC_VERSION_UNKNOWN) {
 		int version = (cmd.response[0] >> 26) & 0xf;
 
@@ -2559,9 +2571,12 @@ static int mmc_startup(struct mmc *mmc)
 	freq = fbase[(cmd.response[0] & 0x7)];
 	mult = multipliers[((cmd.response[0] >> 3) & 0xf)];
 
-	mmc->legacy_speed = freq * mult;
+	mmc->legacy_speed = ((u64)(freq) * mult);
 	mmc_select_mode(mmc, MMC_LEGACY);
 
+#ifdef MMC_DEBUG
+	printf("0 [LY] freq=0x%08x, mult=0x%08x,mmc->tran_speed=%lld\n",freq,mult,mmc->tran_speed);
+#endif
 	mmc->dsr_imp = ((cmd.response[1] >> 12) & 0x1);
 	mmc->read_bl_len = 1 << ((cmd.response[1] >> 16) & 0xf);
 #if CONFIG_IS_ENABLED(MMC_WRITE)
@@ -2576,10 +2591,16 @@ static int mmc_startup(struct mmc *mmc)
 		csize = (mmc->csd[1] & 0x3f) << 16
 			| (mmc->csd[2] & 0xffff0000) >> 16;
 		cmult = 8;
+		#ifdef MMC_DEBUG
+		printf("1 [LY] csize=0x%lld, cmult=0x%lld\n",csize,cmult);
+		#endif
 	} else {
 		csize = (mmc->csd[1] & 0x3ff) << 2
 			| (mmc->csd[2] & 0xc0000000) >> 30;
 		cmult = (mmc->csd[2] & 0x00038000) >> 15;
+		#ifdef MMC_DEBUG
+		printf("1.1 [LY] csize=%lld, cmult=%lld\n",csize,cmult);
+		#endif
 	}
 
 	mmc->capacity_user = (csize + 1) << (cmult + 2);

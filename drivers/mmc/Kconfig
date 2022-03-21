@@ -887,6 +887,22 @@ config FSL_ESDHC_PIN_MUX
 	bool "Perform esdhc device-tree fixup"
 	depends on (FSL_ESDHC || FSL_ESDHC_IMX) && OF_LIBFDT
 
+config RTK_MMC_DRIVER
+	bool "open and build the RTK_MMC"
+	help
+	  Support for the build the RTK EMMC
+
+config RTK_SD_DRIVER
+	bool "open and build the RTK_SD"
+	help
+	  Support for the build the RTK SD
+
+config SPL_RTK_SD_DRIVER
+	bool "open and build the RTK_SD in SPL"
+	depends on SPL
+	help
+	  Support for the build the RTK SD
+
 endmenu
 
 config SYS_FSL_ERRATUM_ESDHC111

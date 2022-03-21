@@ -19,6 +19,13 @@ obj-y += mmc_legacy.o
 endif
 
 obj-$(CONFIG_SUPPORT_EMMC_BOOT) += mmc_boot.o
+ifdef CONFIG_TARGET_RTD1319
+obj-$(CONFIG_RTK_MMC_DRIVER) += rtkemmc_rtd131x.o rtkemmc_generic.o
+endif
+ifdef CONFIG_TARGET_RTD1619B
+obj-$(CONFIG_RTK_MMC_DRIVER) += rtkemmc_rtd161xb.o
+endif
+obj-$(CONFIG_$(SPL_)RTK_SD_DRIVER) += rtksdmmc.o
 
 ifdef CONFIG_SPL_BUILD
 obj-$(CONFIG_SPL_MMC_BOOT) += fsl_esdhc_spl.o
