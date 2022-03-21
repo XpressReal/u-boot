@@ -105,3 +105,10 @@ obj-$(CONFIG_$(SPL_TPL_)STACKPROTECTOR) += stackprot.o
 obj-$(CONFIG_SCP03) += scp03.o
 
 obj-$(CONFIG_QFW) += qfw.o
+
+ifndef CONFIG_SPL_BUILD
+# rtk pmic
+obj-$(CONFIG_CMD_RTK_PMIC) += pmic/
+obj-y += rtk_bsv/
+obj-y += rtk_opp/
+endif

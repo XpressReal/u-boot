@@ -1140,6 +1140,12 @@ endif # VPL_BLOBLIST
 
 endmenu
 
+menu "Realtek freq and volt control"
+source "common/pmic/Kconfig"
+source "common/rtk_bsv/Kconfig"
+source "common/rtk_opp/Kconfig"
+endmenu
+
 source "common/spl/Kconfig"
 
 config IMAGE_SIGN_INFO
