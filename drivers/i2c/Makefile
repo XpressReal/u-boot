@@ -56,3 +56,7 @@ obj-$(CONFIG_SYS_I2C_XILINX_XIIC) += xilinx_xiic.o
 obj-$(CONFIG_TEGRA186_BPMP_I2C) += tegra186_bpmp_i2c.o
 
 obj-$(CONFIG_$(SPL_)I2C_MUX) += muxes/
+
+obj-y += rtk_i2c-pow.o
+obj-y += rtk_i2c-lib.o
+obj-y += rtk_i2c.o
