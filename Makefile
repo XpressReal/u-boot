@@ -1147,6 +1147,7 @@ ifneq ($(CONFIG_SPL_FIT_GENERATOR),)
 endif
 	$(call deprecated,CONFIG_WDT,DM watchdog,v2019.10,\
 		$(CONFIG_WATCHDOG)$(CONFIG_HW_WATCHDOG))
+	$(call deprecated,CONFIG_DM_ETH,Ethernet drivers,v2020.07,$(CONFIG_NET))
 	$(call deprecated,CONFIG_DM_I2C,I2C drivers,v2022.04,$(CONFIG_SYS_I2C_LEGACY))
 	@# CFG_SYS_TIMER_RATE has brackets in it for some boards which
 	@# confuses this rule. Use if() to send just a single character which
