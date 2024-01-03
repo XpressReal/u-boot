@@ -26,6 +26,12 @@ config SPI_FLASH_SANDBOX
 	  device. Typically the contents of the emulated SPI flash device is
 	  stored in a file on the host filesystem.
 
+config SPI_RTK_SFC
+	bool "Realtek SPI-NOR Flash Controller(SFC)"
+	depends on SPI_FLASH || DM_SPI_FLASH
+	help
+	  This enables support for Realtek SPI-NOR flash controller.
+
 config SPI_FLASH
 	bool "SPI Flash Core Interface support"
 	select SPI_MEM
