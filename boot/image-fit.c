@@ -1976,6 +1976,10 @@ static int fit_image_select(const void *fit, int rd_noffset, int verify)
 {
 	fit_image_print(fit, rd_noffset, "   ");
 
+#ifdef CONFIG_SPL_BUILD
+	verify = 1;
+#endif
+
 	if (verify) {
 		puts("   Verifying Hash Integrity ... ");
 		if (!fit_image_verify(fit, rd_noffset)) {
