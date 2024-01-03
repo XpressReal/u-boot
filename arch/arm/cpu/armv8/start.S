@@ -172,7 +172,12 @@ pie_fixup_done:
 	 */
 
 	/* Processor specific initialization */
+	/* When bootcode is in el2, not to set gic. */
+	switch_el x1, 3f, 2f, 1f
+3:
 	bl	lowlevel_init
+2:
+1:
 
 #if defined(CONFIG_ARMV8_SPIN_TABLE) && !defined(CONFIG_SPL_BUILD)
 	branch_if_master x0, master_cpu
