@@ -40,6 +40,9 @@ DECLARE_GLOBAL_DATA_PTR;
 static int stored_bootdelay;
 static int menukey;
 
+/*TAB keycode */
+#define RESCUE_KEY 9
+
 #if defined(CONFIG_AUTOBOOT_STOP_STR_CRYPT)
 #define AUTOBOOT_STOP_STR_CRYPT	CONFIG_AUTOBOOT_STOP_STR_CRYPT
 #else
@@ -378,7 +381,7 @@ static int abortboot_single_key(int bootdelay)
 	 * Check if key already pressed
 	 */
 	if (tstc()) {	/* we got a key press	*/
-		getchar();	/* consume input	*/
+		menukey = getchar();	/* consume input	*/
 		puts("\b\b\b 0");
 		abort = 1;	/* don't auto boot	*/
 	}
@@ -389,13 +392,11 @@ static int abortboot_single_key(int bootdelay)
 		ts = get_timer(0);
 		do {
 			if (tstc()) {	/* we got a key press	*/
-				int key;
 
 				abort  = 1;	/* don't auto boot	*/
 				bootdelay = 0;	/* no more delay	*/
-				key = getchar();/* consume input	*/
-				if (IS_ENABLED(CONFIG_AUTOBOOT_USE_MENUKEY))
-					menukey = key;
+				menukey = getchar();/* consume input	*/
+
 				break;
 			}
 			udelay(10000);
@@ -405,7 +406,6 @@ static int abortboot_single_key(int bootdelay)
 	}
 
 	putc('\n');
-
 	return abort;
 }
 
@@ -504,10 +504,16 @@ void autoboot_command(const char *s)
 			disable_ctrlc(prev);	/* restore Ctrl-C checking */
 	}
 
-	if (IS_ENABLED(CONFIG_AUTOBOOT_USE_MENUKEY) &&
-	    menukey == AUTOBOOT_MENUKEY) {
-		s = env_get("menucmd");
+	if(menukey) {
+		if (IS_ENABLED(CONFIG_AUTOBOOT_USE_MENUKEY) &&
+		menukey == AUTOBOOT_MENUKEY) 
+			s = env_get("menucmd");
+		else if (menukey == RESCUE_KEY) 
+			s = env_get("altbootcmd");
+		else
+			s = NULL;
 		if (s)
 			run_command_list(s, -1, 0);
 	}
+
 }
