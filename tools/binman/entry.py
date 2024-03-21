@@ -462,7 +462,8 @@ class Entry(object):
 
             # Don't let the data shrink. Pad it if necessary
             if size_ok and new_size < self.contents_size:
-                data += tools.get_bytes(0, self.contents_size - new_size)
+                 pad_byte = self._pad_byte if hasattr(self, '_pad_byte') else 0
+                 data += tools.get_bytes(pad_byte or 0, self.contents_size - new_size)
 
         if not size_ok:
             tout.debug("Entry '%s' size change from %s to %s" % (

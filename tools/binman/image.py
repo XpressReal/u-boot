@@ -225,11 +225,17 @@ class Image(section.Entry_section):
         parts = entry_path.split('/')
         entries = self.GetEntries()
         parent = '/'
+        pad_byte = None
         for part in parts:
             entry = entries.get(part)
             if not entry:
                 raise ValueError("Entry '%s' not found in '%s'" %
                                  (part, parent))
+            if hasattr(entry, '_pad_byte'):
+                if entry._pad_byte is not None:
+                    pad_byte = entry._pad_byte
+                elif pad_byte is not None and not hasattr(entry, 'fill_value'):
+                    entry._pad_byte = pad_byte
             parent = entry.GetPath()
             entries = entry.GetEntries()
         return entry

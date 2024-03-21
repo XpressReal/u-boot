@@ -35,6 +35,7 @@ class Entry_blob(Entry):
         super().__init__(section, etype, node,
                          auto_write_symbols=auto_write_symbols)
         self._filename = fdt_util.GetString(self._node, 'filename', self.etype)
+        self._pad_byte = None
         self.elf_fname = fdt_util.GetString(self._node, 'elf-filename',
                                             self.elf_fname)
         self.elf_base_sym = fdt_util.GetString(self._node, 'elf-base-sym')

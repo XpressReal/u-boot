@@ -770,6 +770,9 @@ def Binman(args):
                                do_compress=not args.compressed,
                                allow_resize=not args.fix_size, write_map=args.map)
 
+                fname = tools.GetOutputFilename(args.image)
+                tools.WriteFile(args.image, tools.ReadFile(fname))
+
             if args.cmd == 'sign':
                 SignEntries(args.image, args.file, args.key, args.algo, args.paths)
 
