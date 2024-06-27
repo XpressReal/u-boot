@@ -130,6 +130,28 @@ static int dwc3_generic_probe(struct udevice *dev,
 	priv->base = map_physmem(plat->base, DWC3_OTG_REGS_END, MAP_NOCACHE);
 	dwc3->regs = priv->base + DWC3_GLOBALS_REGS_START;
 
+	if (device_is_compatible(dev->parent, "realtek,rtd-dwc3")) {
+		dwc3->regs = priv->base + 0x8100;
+		pr_info("rtd-dwc3 fix the DWC3_GLOBALS_REGS_START to 0x8100\n");
+
+		if (plat->dr_mode == USB_DR_MODE_OTG) {
+			struct udevice *parent;
+			struct dwc3_glue_ops *ops;
+			enum usb_dr_mode dr_mode;
+
+			if (device_get_uclass_id(dev) == UCLASS_USB_GADGET_GENERIC)
+				dr_mode = USB_DR_MODE_PERIPHERAL;
+			else
+				dr_mode = USB_DR_MODE_HOST;
+
+			dwc3->dr_mode = dr_mode;
+			parent = dev->parent;
+			ops = (struct dwc3_glue_ops *)dev_get_driver_data(parent);
+
+			if (ops && ops->glue_configure)
+				ops->glue_configure(parent, 0, dr_mode);
+		}
+	}
 
 	rc =  dwc3_init(dwc3);
 	if (rc) {
@@ -420,6 +442,44 @@ struct dwc3_glue_ops rk_ops = {
 	.glue_get_ctrl_dev = dwc3_rk_glue_get_ctrl_dev,
 };
 
+void dwc3_rtd_select_dr_mode(struct udevice *dev, int index,
+			    enum usb_dr_mode mode)
+{
+	struct dwc3_glue_data *glue = dev_get_plat(dev);
+	void *base = map_physmem(glue->regs, 0x100, MAP_NOCACHE);
+	u32 val;
+
+#define WRAP_USB2_PHY_REG  0x70
+#define SWITCH_MASK 0x0fff
+#define SWITCH_DEVICE 0x0
+#define SWITCH_HOST 0x606
+
+	val = ~SWITCH_MASK & readl(base + WRAP_USB2_PHY_REG);
+
+	switch (mode) {
+	case USB_DR_MODE_PERIPHERAL:
+		val |= SWITCH_DEVICE;
+		debug("%s DEVICE mode, switch_addr 0x%x, val=0x%x\n",
+			__func__, base + WRAP_USB2_PHY_REG, val);
+		writel(val, base + WRAP_USB2_PHY_REG);
+		break;
+	case USB_DR_MODE_HOST:
+		val |= SWITCH_HOST;
+		debug("%s HOST mode, switch_addr 0x%x, val=0x%x\n",
+			__func__, base + WRAP_USB2_PHY_REG, val);
+		writel(val, base + WRAP_USB2_PHY_REG);
+		break;
+	default:
+		break;
+	}
+
+	unmap_physmem(base, MAP_NOCACHE);
+}
+
+struct dwc3_glue_ops rtd_ops = {
+	.glue_configure = dwc3_rtd_select_dr_mode,
+};
+
 static int dwc3_glue_bind_common(struct udevice *parent, ofnode node)
 {
 	const char *name = ofnode_get_name(node);
@@ -436,12 +496,37 @@ static int dwc3_glue_bind_common(struct udevice *parent, ofnode node)
 		dr_mode = usb_get_dr_mode(node);
 
 	if (CONFIG_IS_ENABLED(DM_USB_GADGET) &&
-	    (dr_mode == USB_DR_MODE_PERIPHERAL || dr_mode == USB_DR_MODE_OTG)) {
-		debug("%s: dr_mode: OTG or Peripheral\n", __func__);
+	    (dr_mode == USB_DR_MODE_PERIPHERAL)) {
+		debug("%s: dr_mode: Peripheral\n", __func__);
 		driver = "dwc3-generic-peripheral";
 	} else if (CONFIG_IS_ENABLED(USB_HOST) && dr_mode == USB_DR_MODE_HOST) {
 		debug("%s: dr_mode: HOST\n", __func__);
 		driver = "dwc3-generic-host";
+	} else if (dr_mode == USB_DR_MODE_OTG) {
+		debug("%s: dr_mode: OTG\n", __func__);
+		if (CONFIG_IS_ENABLED(DM_USB_GADGET)) {
+			debug("%s: dr_mode: OTG or Peripheral\n", __func__);
+			driver = "dwc3-generic-peripheral";
+			ret = device_bind_driver_to_node(parent, driver, name,
+							 node, &dev);
+			if (ret) {
+				debug("%s: not able to bind usb device mode\n",
+				      __func__);
+				return ret;
+			}
+		}
+		if (CONFIG_IS_ENABLED(USB_HOST)) {
+			debug("%s: dr_mode: HOST\n", __func__);
+			driver = "dwc3-generic-host";
+			ret = device_bind_driver_to_node(parent, driver, name,
+							 node, &dev);
+			if (ret) {
+				debug("%s: not able to bind usb device mode\n",
+				      __func__);
+				return ret;
+			}
+		}
+		return 0;
 	} else {
 		debug("%s: unsupported dr_mode %d\n", __func__, dr_mode);
 		return -ENODEV;
@@ -615,6 +700,7 @@ static const struct udevice_id dwc3_glue_ids[] = {
 	{ .compatible = "fsl,imx8mp-dwc3", .data = (ulong)&imx8mp_ops },
 	{ .compatible = "fsl,imx8mq-dwc3" },
 	{ .compatible = "intel,tangier-dwc3" },
+	{ .compatible = "realtek,rtd-dwc3", .data = (ulong)&rtd_ops },
 	{ }
 };
 
