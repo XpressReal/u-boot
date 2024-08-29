@@ -1418,6 +1418,17 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-sk.dtb \
 dtb-$(CONFIG_SOC_K3_AM62A7) += k3-am62a7-sk.dtb \
 			      k3-am62a7-r5-sk.dtb
 
+# dtb-$(CONFIG_ARCH_REALTEK)
+dtb-$(CONFIG_TARGET_RTD1319) += \
+       rtd1319-pymparticles-spi.dtb
+
+dtb-$(CONFIG_TARGET_RTD1619B) += \
+	cipher.dtbo \
+	tee.dtbo \
+	rtd1619b-bleedingedge-emmc.dtb \
+	rtd1619b-bleedingedge-spi.dtb \
+	rtd1619b-backinblack.dtb
+
 dtb-$(CONFIG_ARCH_MEDIATEK) += \
 	mt7622-rfb.dtb \
 	mt7623a-unielec-u7623-02-emmc.dtb \

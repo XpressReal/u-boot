@@ -1049,6 +1049,17 @@ config ARCH_QEMU
 	imply USB_KEYBOARD
 	imply CMD_USB
 
+config ARCH_REALTEK
+	bool "RealTek RTD1xxx SoCs"
+	select ARM64
+	select SPL_LIBCOMMON_SUPPORT if SPL
+	select SPL_LIBGENERIC_SUPPORT if SPL
+	select SUPPORT_SPL
+	select FIT
+	select PYLIBFDT
+	help
+	  Support for the Realtek RTD1xxx SoCs family developed by Realtek Inc.
+
 config ARCH_RMOBILE
 	bool "Renesas ARM SoCs"
 	select DM
@@ -2242,6 +2253,8 @@ source "arch/arm/mach-meson/Kconfig"
 source "arch/arm/mach-mediatek/Kconfig"
 
 source "arch/arm/mach-qemu/Kconfig"
+
+source "arch/arm/mach-realtek/Kconfig"
 
 source "arch/arm/mach-rockchip/Kconfig"
 
