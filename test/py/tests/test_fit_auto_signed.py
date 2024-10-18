@@ -6,7 +6,7 @@ Test that mkimage generates auto-FIT with signatures and/or hashes as expected.
 
 The mkimage tool can create auto generated (i.e. without an ITS file
 provided as input) FIT in three different flavours: with crc32 checksums
-of 'images' subnodes; with signatures of 'images' subnodes; with sha1
+of 'images' subnodes; with signatures of 'images' subnodes; with sha256
 hashes of 'images' subnodes and signatures of 'configurations' subnodes.
 This test verifies that auto-FIT are generated as expected, in all of
 the three flavours, including check of hashes and signatures (except for
@@ -19,7 +19,6 @@ import os
 import pytest
 import u_boot_utils as util
 import binascii
-from Cryptodome.Hash import SHA1
 from Cryptodome.Hash import SHA256
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Signature import pkcs1_15
@@ -97,7 +96,7 @@ class SignedFitHelper(object):
     def check_fit_signed_confgs(self, key_name, sign_algo):
         """Test that all configs are signed, and images hashed, as expected.
 
-        Each image must have an hash with algo=sha1 and hash value must match
+        Each image must have an hash with algo=sha256 and hash value must match
         the one calculated over image data. Each configuration must have a
         signature with key-name-hint matching key_name argument and algo
         matching sign_algo argument.
@@ -105,11 +104,11 @@ class SignedFitHelper(object):
         """
         for node in self.images_nodes:
             algo = self.__fdt_get_string(f'{node}/hash', 'algo')
-            assert algo == "sha1\n", "Missing expected sha1 image hash!"
+            assert algo == "sha256\n", "Missing expected sha256 image hash!"
 
             raw_hash = self.__fdt_get_binary(f'{node}/hash', 'value')
             raw_bin = self.__fdt_get_binary(node, 'data')
-            assert raw_hash == SHA1.new(raw_bin).digest(), "Wrong sha1 hash!"
+            assert raw_hash == SHA256.new(raw_bin).digest(), "Wrong sha256 hash!"
 
         for node in self.confgs_nodes:
             hint = self.__fdt_get_string(f'{node}/signature', 'key-name-hint')
@@ -125,7 +124,7 @@ def test_fit_auto_signed(u_boot_console):
 
     The mkimage tool can create auto generated (i.e. without an ITS file
     provided as input) FIT in three different flavours: with crc32 checksums
-    of 'images' subnodes; with signatures of 'images' subnodes; with sha1
+    of 'images' subnodes; with signatures of 'images' subnodes; with sha256
     hashes of 'images' subnodes and signatures of 'configurations' subnodes.
     This test verifies that auto-FIT are generated as expected, in all of
     the three flavours, including check of hashes and signatures (except for

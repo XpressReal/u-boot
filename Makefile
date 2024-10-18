@@ -1384,6 +1384,9 @@ $(U_BOOT_ITS): $(U_BOOT_ITS_DEPS) FORCE
 endif
 endif
 
+KEYDIR = ../keys
+KEYFILE = $(firstword $(wildcard $(KEYDIR)/uboot.key $(KEYDIR)/dev.key))
+KEYNAME = $(basename $(notdir $(KEYFILE)))
 ifdef CONFIG_SPL_LOAD_FIT
 MKIMAGEFLAGS_u-boot.img = -f auto -A $(ARCH) -T firmware -C none -O u-boot \
 	-a $(CONFIG_TEXT_BASE) -e $(CONFIG_SYS_UBOOT_START) \
@@ -1392,6 +1395,9 @@ MKIMAGEFLAGS_u-boot.img = -f auto -A $(ARCH) -T firmware -C none -O u-boot \
 	$(patsubst %,-b arch/$(ARCH)/dts/%.dtb,$(subst ",,$(DEVICE_TREE))) \
 	$(patsubst %,-b arch/$(ARCH)/dts/%.dtb,$(subst ",,$(CONFIG_OF_LIST))) \
 	$(patsubst %,-b arch/$(ARCH)/dts/%.dtbo,$(subst ",,$(CONFIG_OF_OVERLAY_LIST)))
+ifneq ($(wildcard $(KEYFILE)),)
+MKIMAGEFLAGS_u-boot.img += -f auto-conf -k $(KEYDIR) -g $(KEYNAME) -o sha256,rsa2048
+endif
 else
 MKIMAGEFLAGS_u-boot.img = -A $(ARCH) -T firmware -C none -O u-boot \
 	-a $(CONFIG_TEXT_BASE) -e $(CONFIG_SYS_UBOOT_START) \
@@ -1450,6 +1456,9 @@ else
 MKIMAGEFLAGS_u-boot.itb = -E
 endif
 MKIMAGEFLAGS_u-boot.itb += -B 0x8
+ifneq ($(wildcard $(KEYFILE)),)
+MKIMAGEFLAGS_u-boot.itb += -k $(KEYDIR) -K $(KEYDIR)/dummy.dtb
+endif
 
 ifdef U_BOOT_ITS
 u-boot.itb: u-boot-nodtb.bin \
