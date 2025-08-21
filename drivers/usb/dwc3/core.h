@@ -1063,7 +1063,7 @@ static inline int dwc3_host_init(struct dwc3 *dwc)
 static inline void dwc3_host_exit(struct dwc3 *dwc)
 { }
 
-#ifdef CONFIG_USB_DWC3_GADGET
+#if CONFIG_IS_ENABLED(USB_DWC3_GADGET)
 int dwc3_gadget_init(struct dwc3 *dwc);
 void dwc3_gadget_exit(struct dwc3 *dwc);
 int dwc3_gadget_set_test_mode(struct dwc3 *dwc, int mode);
