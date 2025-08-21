@@ -1,0 +1,52 @@
+menu "Realtek PMIC command"
+config CMD_RTK_PMIC
+	bool "Realtek PMIC command"
+	default y
+	help
+	  this enable realtek pmic command
+
+config RTK_PMIC_G2227
+	bool "Enable GMT G2227 support"
+	depends on CMD_RTK_PMIC
+	help
+	  enable GMT G2227 in Realtek PMIC command
+
+config RTK_PMIC_G2237
+	bool "Enable GMT G2237 support "
+	depends on CMD_RTK_PMIC
+	help
+	  enable GMT G2237 in Realtek PMIC command
+
+config RTK_PMIC_SY8827E
+	bool "Enable Silergy SY8827E support"
+	depends on CMD_RTK_PMIC
+	help
+	  enable Silergy SY8827E in Realtek PMIC command
+
+config RTK_PMIC_SY8824C
+	bool "Enable Silergy SY8827C support"
+	depends on CMD_RTK_PMIC
+	help
+	  enable Silergy SY8827C in Realtek PMIC command
+
+config RTK_PMIC_APW8889
+	bool "Enable Anpec APW8889 support"
+	depends on CMD_RTK_PMIC
+	help
+	  enable Anpec APW8889 in Realtek PMIC command
+
+config RTK_PMIC_APW8886
+	bool "Enable Anpec APW8886 support"
+	depends on CMD_RTK_PMIC
+	help
+	  enable Anpec APW8886 in Realtek PMIC command
+
+config RTK_PMIC_PWM_DT
+	bool "Enable PWM DCDC support"
+	default y
+	depends on CMD_RTK_PMIC
+	depends on RTK_PWM
+	help
+	  enable PWM-DCDC config form kernel DT in Realtek PMIC command
+
+endmenu

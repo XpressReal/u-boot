@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
+/*
+ * Copyright (c) 2020 Realtek Semiconductor Corp.
+ */
+
+/dts-v1/;
+
+#include "rtd1619b-backinblack.dtsi"
+
+/ {
+	compatible = "realtek,back-in-black", "realtek,rtd1619b";
+	model = "Realtek Back in Black EVB";
+};
+
+&soc {
+	bootph-all;
+};
+
+&rbus {
+	bootph-all;
+};
+
+&usb_manager {
+	bootph-all;
+};
+
+&usb_port2_usb2phy {
+	bootph-all;
+};
+
+&usb_port2 {
+	bootph-all;
+};
+
+&usb_port2_dwc3 {
+	bootph-all;
+};
+
+&emmc {
+	bootph-all;
+};

@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
+/*
+ * Copyright (c) 2020 Realtek Semiconductor Corp.
+ */
+
+/dts-v1/;
+
+#include "rtd1619b-bleedingedge.dtsi"
+
+/ {
+	compatible = "realtek,bleeding-edge-emmc", "realtek,rtd1619b";
+	model = "Realtek Bleeding Edge EVB eMMC";
+};
+
+&signature {
+	bootph-all;
+};
+
+&key_dev {
+	bootph-all;
+};
+
+&soc {
+	bootph-all;
+};
+
+&rbus {
+	bootph-all;
+};
+
+&sd {
+	bootph-all;
+	status = "okay";
+};
+
+&usb_manager {
+	bootph-all;
+};
+
+&usb_port0_usb2phy {
+	bootph-all;
+};
+
+&usb_port0 {
+	bootph-all;
+        realtek,power-gpio = <&gpio 48 GPIO_ACTIVE_HIGH>;
+        status = "okay";
+};
+
+&usb_port0_dwc3 {
+	bootph-all;
+};
+
+&usb_port1_usb2phy {
+	bootph-all;
+};
+
+&usb_port1 {
+	bootph-all;
+};
+
+&usb_port1_dwc3 {
+	bootph-all;
+};
+
+&usb_port2_usb2phy {
+	bootph-all;
+};
+
+&usb_port2_usb3phy {
+	bootph-all;
+};
+
+&usb_port2 {
+	bootph-all;
+};
+
+&usb_port2_dwc3 {
+	bootph-all;
+	dr_mode = "host"; /* otg, host, peripheral*/
+	role-switch-default-mode = "host"; /* host, peripheral */
+};
+
+&type_c {
+	bootph-all;
+};
+
+&emmc {
+	bootph-all;
+};

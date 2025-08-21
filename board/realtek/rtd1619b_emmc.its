@@ -1,0 +1,190 @@
+/dts-v1/;
+
+/ {
+    description = "U-Boot proper and firmware blobs, loaded by U-Boot SPL";
+    #address-cells = <1>;
+
+    images {
+        uboot {
+            description = "U-Boot (64-bit)";
+            data = /incbin/("u-boot-nodtb.bin");
+            type = "firmware";
+            os = "u-boot";
+            arch = "arm64";
+            compression = "none";
+            entry = <0x03F60000>;
+            load = <0x03F60000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        fdt {
+            description = "U-Boot DTB";
+            data = /incbin/("dts/dt.dtb");
+            type = "flat_dt";
+            arch = "arm64";
+            compression = "none";
+            load = <0x03000000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        fdt_cipher {
+            description = "cipher DTBO";
+            data = /incbin/("arch/arm/dts/cipher.dtbo");
+            type = "flat_dt";
+            arch = "arm64";
+            compression = "none";
+            load = <0x030F0000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        fdt-1 {
+            description = "bleedingedge-emmc DTB";
+            data = /incbin/("arch/arm/dts/rtd1619b-bleedingedge-emmc.dtb");
+            type = "flat_dt";
+            arch = "arm64";
+            compression = "none";
+            load = <0x03000000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        fdt-2 {
+            description = "backinblack DTB";
+            data = /incbin/("arch/arm/dts/rtd1619b-backinblack.dtb");
+            type = "flat_dt";
+            arch = "arm64";
+            compression = "none";
+            load = <0x03000000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        pcpu_cert {
+            description = "Certificate for PCPU FW";
+            data = /incbin/("./source/fw/PCPU_Certificate_final.bin");
+            type = "firmware";
+            arch = "arm64";
+            compression = "none";
+            load = <0x01500000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        pcpu {
+            description = "PCPU FW";
+            data = /incbin/("./source/fw/PCPU_Code_Area_final.bin");
+            type = "firmware";
+            arch = "arm64";
+            compression = "none";
+            load = <0x01500400>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        tee {
+                description = "OPTEE";
+                data = /incbin/("./source/fw/Secure_OS_Area_flash_layout_0.bin");
+                type = "tee";
+                arch = "arm64";
+                compression = "none";
+                os = "tee";
+                load = <0x01510000>;
+                entry = <0x01510000>;
+                hash-1 {
+                        algo = "sha256";
+                };
+        };
+    };
+
+    configurations {
+        default = "normal";
+
+        normal {
+            description = "Boot to U-Boot proper with FWs";
+            firmware = "uboot";
+            fdt = "fdt", "fdt_cipher";
+            loadables = "pcpu_cert", "pcpu";
+            signature-1 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "uboot";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+            signature-2 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "dev";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+        };
+
+        rtd1619b-bleedingedge-emmc-tee {
+            description = "rtd1619b-bleedingedge-emmc-tee";
+            firmware = "uboot";
+            fdt = "fdt-1", "fdt_cipher";
+            loadables = "pcpu_cert", "pcpu", "tee";
+            signature-1 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "uboot";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+            signature-2 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "dev";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+        };
+
+        rtd1619b-bleedingedge-emmc {
+            description = "rtd1619b-bleedingedge-emmc";
+            firmware = "uboot";
+            fdt = "fdt-1", "fdt_cipher";
+            loadables = "pcpu_cert", "pcpu";
+            signature-1 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "uboot";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+            signature-2 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "dev";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+        };
+
+        rtd1619b-backinblack-tee {
+            description = "rtd1619b-backinblack-tee";
+            firmware = "uboot";
+            fdt = "fdt-2", "fdt_cipher";
+            loadables = "pcpu_cert", "pcpu", "tee";
+            signature-1 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "uboot";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+            signature-2 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "dev";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+        };
+
+        rtd1619b-backinblack {
+            description = "rtd1619b-backinblack";
+            firmware = "uboot";
+            fdt = "fdt-2", "fdt_cipher";
+            loadables = "pcpu_cert", "pcpu";
+            signature-1 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "uboot";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+            signature-2 {
+                algo = "sha256,rsa2048";
+                key-name-hint = "dev";
+                sign-images = "fdt", "firmware", "loadables";
+            };
+        };
+    };
+};

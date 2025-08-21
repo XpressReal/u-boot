@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
+/*
+ * Copyright (c) 2020 Realtek Semiconductor Corp.
+ */
+
+/dts-v1/;
+
+#include "rtd1619b-bleedingedge.dtsi"
+
+/ {
+	compatible = "realtek,bleeding-edge-spi", "realtek,rtd1619b";
+	model = "Realtek Bleeding Edge EVB SPI";
+
+	config {
+		//u-boot,spl-payload-offset = <0x90000>; /* @ 576KB */
+	};
+};
+
+&soc {
+	bootph-all;
+};
+
+&rbus {
+	bootph-all;
+};
+
+&sb2 {
+	bootph-all;
+};
+
+&sd {
+	bootph-all;
+	status = "okay";
+};
+
+&sfc {
+	bootph-all;
+	status = "okay";
+};

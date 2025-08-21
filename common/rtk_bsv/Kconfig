@@ -1,0 +1,5 @@
+config CMD_RTK_BSV
+	bool "Realtek BSV command"
+	select RTK_OPP
+	help
+	  this enable realtek BSV command

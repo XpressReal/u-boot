@@ -1,0 +1,3 @@
+config RTK_OPP
+	bool
+	select OF_LIBFDT

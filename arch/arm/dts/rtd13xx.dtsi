@@ -1,0 +1,257 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
+/*
+ * Realtek RTD13xx SoC family
+ *
+ * Copyright (c) 2019-2020 Realtek Semiconductor Corp.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/rtd1319-clk.h>
+#include <dt-bindings/reset/rtd1319-reset.h>
+
+/ {
+	interrupt-parent = <&gic>;
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	aliases {
+		serial0 = &uart0;
+		mmc0 = &emmc;
+	};
+
+	clocks {
+		osc27m: osc {
+			compatible = "fixed-clock";
+			clock-frequency = <27000000>;
+			clock-output-names = "osc27m";
+			#clock-cells = <0>;
+		};
+
+		baudclk: baudclk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <432000000>;
+			clock-output-names = "baudclk";
+		};
+	};
+
+	soc: soc@0 {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0x00000000 0x00000000 0x0002e000>, /* boot ROM */
+			 <0x00030000 0x00030000 0x00030000>, /* PCIE IO*/
+			 <0xff100000 0xff100000 0x00200000>, /* GIC */
+			 <0xC0000000 0xC0000000 0x00100000>,
+			 <0xC1000000 0xC1000000 0x00100000>,
+			 <0x98000000 0x98000000 0x00200000>; /* rbus */
+
+		rbus: rbus@98000000 {
+			compatible = "simple-bus";
+			reg = <0x98000000 0x200000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			ranges = <0x00000000 0x98000000 0x200000>,
+				 <0xC0000000 0xC0000000 0x00100000>,
+				 <0xC1000000 0xC1000000 0x00100000>,
+				 <0x10030000 0x00030000 0x00030000>; /* PCIE IO*/
+
+			crt: syscon@0 {
+				compatible = "realtek,rtd1319-crt", "syscon", "simple-mfd";
+				reg = <0x0 0x1000>;
+				reg-io-width = <4>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0x0 0x0 0x1000>;
+			};
+
+			pinctrl: pinctrl@4e000 {
+				compatible = "realtek,rtd13xx-pinctrl", "syscon";
+				reg = <0x4e000 0x130>;
+				reg-io-width = <4>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				#gpio-range-cells = <3>;
+				ranges = <0x0 0x4e000 0x130>;
+			};
+
+			iso: syscon@7000 {
+				compatible = "syscon", "simple-mfd";
+				reg = <0x7000 0x1000>;
+				reg-io-width = <4>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0x0 0x7000 0x1000>;
+			};
+
+			sb2: syscon@1a000 {
+				compatible = "syscon", "simple-mfd";
+				reg = <0x1a000 0x1000>;
+				reg-io-width = <4>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0x0 0x1a000 0x1000>;
+			};
+
+			emmc: emmc@12000 {
+				compatible = "rtk13xx-dw-cqe-emmc";
+				reg = <0x00012000 0x00600>,
+				      <0x00012180 0x00060>;
+				reg-names = "emmc","cqhci";
+				realtek,m2tmx = <&m2tmx>;
+				interrupts = <0 42 4>;
+				clocks = <&cc RTD1319_CRT_CLK_EN_EMMC>,
+					 <&cc RTD1319_CRT_CLK_EN_EMMC_IP>,
+					 <&cc RTD1319_CRT_PLL_EMMC_VP0>,
+					 <&cc RTD1319_CRT_PLL_EMMC_VP1>;
+
+				clock-names = "biu", "ciu", "vp0", "vp1";
+				clock-freq-min-max = <300000 400000000>;
+				clock-frequency = <400000>;
+				vmmc-supply = <&reg_vcc1v8>;
+				resets = <&cc RTD1319_CRT_RSTN_EMMC>;
+				reset-names = "reset";
+				speed-step = <3>;
+				cqe = <1>;
+				rdq-ctrl = <0>;
+
+				pinctrl-names = "default", "sdr50", "ddr50", "hs200", "hs400", "tune0", "tune1", "tune2", "tune3", "tune4";
+				pinctrl-0 = <&emmc_pins_sdr50>;
+				pinctrl-1 = <&emmc_pins_sdr50>;
+				pinctrl-2 = <&emmc_pins_ddr50>;
+				pinctrl-3 = <&emmc_pins_hs200>;
+				pinctrl-4 = <&emmc_pins_hs400>;
+				pinctrl-5 = <&emmc_pins_tune0>;
+				pinctrl-6 = <&emmc_pins_tune1>;
+				pinctrl-7 = <&emmc_pins_tune2>;
+				pinctrl-8 = <&emmc_pins_tune3>;
+				pinctrl-9 = <&emmc_pins_tune4>;
+				status = "disabled";
+			};
+
+			sd: sdmmc@10400 {
+				compatible = "realtek,rtd13xx-sdmmc";
+				reg = <0x10400 0x200>, /* SDMMC */
+				      <0x00000 0x400>, /* CRT */
+				      <0x1A000 0x400>, /* BS2 */
+				      <0x4E000 0x60>, /* ISO */
+				      <0x10A00 0x40>, /* SDIO */
+				      <0x07000 0x200>;
+				interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
+				sd-power-gpios = <&gpio 30 GPIO_ACTIVE_HIGH>; /*sd power , output, default high  (poweroff) */
+				sd-wp-gpios = <&gpio 34 GPIO_PULL_UP>;
+				sd-cd-gpios = <&gpio 35 GPIO_PULL_UP>;
+				sdmmc-bounce = <1>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&sdcard_pins_low>,
+					    <&scpu_ejtag_pins_disable>;
+				clocks = <&cc RTD1319_CRT_CLK_EN_SD>,
+					 <&cc RTD1319_CRT_CLK_EN_SD_IP>;
+				clock-names = "sd", "sd_ip";
+				resets = <&cc RTD1319_CRT_RSTN_SD>;
+				status = "disabled";
+			};
+
+			m2tmx: m2tmx@4f000 {
+				compatible = "syscon", "simple-mfd";
+				reg = <0x4f000 0x1000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0x0 0x4f000 0x1000>;
+			};
+		};
+
+		gic: interrupt-controller@ff100000 {
+			compatible = "arm,gic-v3";
+			#address-cells = <1>;
+			reg = <0xff100000 0x10000>,
+			      <0xff140000 0x80000>;
+			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-controller;
+			#interrupt-cells = <3>;
+		};
+	};
+
+	reg_vcc1v8: vcc1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+};
+
+&crt {
+	cc: clock-controller {
+		compatible = "realtek,rtd1319-crt-clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+		realtek,sb2-lock = <&sb2_lock0>;
+	};
+};
+
+&iso {
+	iso_irq_mux: iso_irq_mux {
+		compatible = "realtek,rtd13xx-iso-irq-mux";
+		syscon = <&iso>;
+		interrupts-extended = <&gic GIC_SPI 41 IRQ_TYPE_LEVEL_HIGH>,
+				      <&gic GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#address-cells = <0>;
+		#interrupt-cells = <1>;
+	};
+
+	uart0: serial@800 {
+		compatible = "snps,dw-apb-uart";
+		reg = <0x800 0x400>;
+		reg-shift = <2>;
+		reg-io-width = <4>;
+		interrupts = <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <432000000>;
+		status = "disabled";
+	};
+
+	gpio: gpio@100 {
+		compatible = "realtek,gpio";
+		reg = <0x100 0x100>,
+		      <0x0 0xB0>;
+		syscon = <&iso>;
+		realtek,gpio_base = <0>;
+		realtek,gpio_numbers = <82>;
+		interrupt-parent = <&iso_irq_mux>;
+		#interrupt-cells = <1>;
+		interrupt-controller;
+		#address-cells = <0>;
+		interrupts = <19>, <20>;
+		gpio-ranges = <&pinctrl 0 0 82>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "disabled";
+	};
+};
+
+&sb2 {
+	sb2_lock0: sb2-lock@0 {
+		compatible = "realtek,sb2-sem";
+		reg = <0x0 0x4>;
+	};
+
+	sfc: sfc@800 {
+		compatible = "realtek,rtd13xx-sfc";
+		reg = <0x800 0x50>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "disabled";
+
+		flash@0 {
+			compatible = "jedec,spi-nor";
+			spi-rx-bus-width = <2>;
+			spi-tx-bus-width = <2>;
+			reg = <0>;
+			spi-max-frequency = <40000000>;
+		};
+	};
+};
+
+#include "rtd13xx-pinctrl.dtsi"

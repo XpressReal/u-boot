@@ -1,0 +1,24 @@
+config BOARD_FIT_CONFIG_NAME
+	string "Board configuration name"
+	default ""
+
+config NO_RELOCATION
+	bool "CONFIG_NO_RELOCATION"
+	default y
+
+config HEAP_ADDR
+	hex "CONFIG_HEAP_ADDR"
+	default 0x07880000
+
+config REALTEK_I2C
+	bool "CONFIG_REALTEK_I2C"
+	default y
+
+config RTL8168
+	bool "CONFIG_RTL8168"
+	default y
+
+config USB_BOOT_GPIO_NUM
+	int "CONFIG_USB_BOOT_GPIO_NUM"
+	depends on USB_STORAGE
+	default 26

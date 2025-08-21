@@ -1,0 +1,40 @@
+if ARCH_REALTEK
+
+config SYS_VENDOR
+	default "realtek"
+
+choice
+	prompt "Realtek board select"
+
+config TARGET_RTD1319
+	bool "Realtek RTD1319 SoC"
+
+config TARGET_RTD1619B
+	bool "Realtek RTD1619B SoC"
+
+endchoice
+
+config SYS_SOC
+	default "realtek"
+
+config SYS_CONFIG_NAME
+	string "Board configuration name"
+	default "rtd1319_emmc" if TARGET_RTD1319 && RTK_MMC_DRIVER
+	default "rtd1319_spi" if TARGET_RTD1319 && SPI_RTK_SFC
+	default "rtd1619b_emmc" if TARGET_RTD1619B && RTK_MMC_DRIVER
+	default "rtd1619b_spi" if TARGET_RTD1619B && SPI_RTK_SFC
+	default ""
+	help
+	  This option contains information about board configuration name.
+	  Based on this option include/configs/<CONFIG_SYS_CONFIG_NAME>.h header
+	  will be used for board configuration.
+
+config RTK_MMC_DRIVER
+	bool "CONFIG_RTK_MMC_DRIVER"
+
+source "board/realtek/Kconfig"
+
+config SPL_LDSCRIPT
+        default "arch/arm/mach-realtek/u-boot-spl.lds"
+
+endif
