@@ -693,7 +693,11 @@ static int setup_reloc(void)
 {
 	if (!(gd->flags & GD_FLG_SKIP_RELOC)) {
 #ifdef CONFIG_TEXT_BASE
-#ifdef ARM
+#ifdef CONFIG_ARM
+#ifdef CONFIG_NO_RELOCATION
+	gd->relocaddr = CONFIG_TEXT_BASE;
+	//gd->start_addr_sp = SYS_INIT_SP_ADDR;
+#endif //CONFIG_NO_RELOCATION
 		gd->reloc_off = gd->relocaddr - (unsigned long)__image_copy_start;
 #elif defined(CONFIG_MICROBLAZE)
 		gd->reloc_off = gd->relocaddr - (u32)_start;

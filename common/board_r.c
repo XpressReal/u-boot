@@ -195,12 +195,17 @@ static int initr_malloc(void)
 	debug("Pre-reloc malloc() used %#lx bytes (%ld KB)\n", gd->malloc_ptr,
 	      gd->malloc_ptr / 1024);
 #endif
+#ifndef CONFIG_NO_RELOCATION
 	/* The malloc area is immediately below the monitor copy in DRAM */
 	/*
 	 * This value MUST match the value of gd->start_addr_sp in board_f.c:
 	 * reserve_noncached().
 	 */
 	start = gd->relocaddr - TOTAL_MALLOC_LEN;
+#else
+	/* RTK disable Relocation */
+	start = CONFIG_HEAP_ADDR;
+#endif //CONFIG_NO_RELOCATION
 	gd_set_malloc_start(start);
 	mem_malloc_init((ulong)map_sysmem(start, TOTAL_MALLOC_LEN),
 			TOTAL_MALLOC_LEN);
