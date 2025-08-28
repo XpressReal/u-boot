@@ -268,18 +268,6 @@ int misc_init_r(void)
 			sprintf(addr, "0x%08x", modulus);
 			env_set("rsa_modulus", addr);
 		}
-
-#if defined(CONFIG_TARGET_RTD1619B)
-		/* no loadables: recovery U-Boot */
-		/* override bootcmd in recovery U-Boot */
-		if (fdt_subnode_offset(gd->fdt_blob, 0, "fit-images") < 0) {
-#ifdef CONFIG_SPI_RTK_SFC
-			env_set("bootcfg", "#rescue");
-#else
-			env_set("bootcmd", "run altbootcmd || ums 1 mmc ${mmcidx}");
-#endif
-		}
-#endif
 	}
 
 	return 0;
