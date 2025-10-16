@@ -674,3 +674,14 @@ config RZG2L_GPIO
 	  on the Renesas RZ/G2L SoC family.
 
 endif
+
+config REALTEK_GPIO
+	bool "Realtek RTD GPIO driver"
+	depends on DM_GPIO
+	help
+	  Support GPIO access on Realtek RTD SoCs including RTD1619B.
+	  The GPIO controller supports 82 GPIOs with configurable
+	  direction (input/output) and value setting.
+	  This driver provides the basic GPIO operations needed for
+	  PCIe PERST control and other GPIO functionality.
+

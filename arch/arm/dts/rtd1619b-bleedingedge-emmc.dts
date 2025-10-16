@@ -88,3 +88,7 @@
 &emmc {
 	bootph-all;
 };
+
+&gpio {
+	status = "okay";
+};
