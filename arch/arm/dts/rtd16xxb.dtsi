@@ -113,6 +113,15 @@
 				ranges = <0x0 0x1a000 0x1000>;
 			};
 
+			scpu_wrapper: syscon@1d000 {
+				compatible = "syscon", "simple-mfd";
+				reg = <0x1d000 0x1000>;
+				reg-io-width = <4>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0x0 0x1d000 0x1000>;
+			};
+
 			m2tmx: syscon@4f000 {
 				compatible = "syscon", "simple-mfd";
 				reg = <0x4f000 0x1000>;
@@ -274,5 +283,6 @@
 
 #include "rtd16xxb-pinctrl.dtsi"
 #include "rtd16xxb-usb.dtsi"
+#include "rtd16xxb-pcie.dtsi"
 
 #include "sign.dtsi"
