@@ -77,4 +77,6 @@ obj-$(CONFIG_ADP5585_GPIO)	+= adp5585_gpio.o
 obj-$(CONFIG_RZG2L_GPIO)	+= rzg2l-gpio.o
 obj-$(CONFIG_TARGET_RTD1319)	+= rt_gpio_131x.o
 obj-$(CONFIG_TARGET_RTD1619B)	+= rt_gpio_161xb.o
+ifndef CONFIG_SPL_BUILD
 obj-$(CONFIG_REALTEK_GPIO)	+= gpio-realtek-rtd.o
+endif
