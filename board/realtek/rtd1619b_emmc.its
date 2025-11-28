@@ -64,7 +64,7 @@
         };
         pcpu_cert {
             description = "Certificate for PCPU FW";
-            data = /incbin/("./source/fw/PCPU_Certificate_final.bin");
+            data = /incbin/("./fw/PCPU_Certificate_final.bin");
             type = "firmware";
             arch = "arm64";
             compression = "none";
@@ -75,7 +75,7 @@
         };
         pcpu {
             description = "PCPU FW";
-            data = /incbin/("./source/fw/PCPU_Code_Area_final.bin");
+            data = /incbin/("./fw/PCPU_Code_Area_final.bin");
             type = "firmware";
             arch = "arm64";
             compression = "none";
@@ -86,7 +86,7 @@
         };
         tee {
                 description = "OPTEE";
-                data = /incbin/("./source/fw/Secure_OS_Area_flash_layout_0.bin");
+                data = /incbin/("./fw/Secure_OS_Area_flash_layout_0.bin");
                 type = "tee";
                 arch = "arm64";
                 compression = "none";

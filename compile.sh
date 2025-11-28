@@ -55,3 +55,6 @@ make "${BUILD_FLAGS[@]}" all -j$(nproc)
 
 sign_spl
 create_uboot_img
+
+cp -vf u-boot.itb u-boot.bin-rtd1619b_emmc
+cp -vf bind_4gb.bin rtd1619b_emmc_bind_4gb.bin
