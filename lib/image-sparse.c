@@ -67,7 +67,14 @@ static lbaint_t write_sparse_chunk_raw(struct sparse_storage *info,
 		return write_blks;
 	}
 
-	aligned_buf = memalign(ARCH_DMA_MINALIGN, info->blksz * aligned_buf_blks);
+	{
+		size_t align = info->blksz;
+
+		if (align < ARCH_DMA_MINALIGN)
+			align = ARCH_DMA_MINALIGN;
+
+		aligned_buf = memalign(align, info->blksz * aligned_buf_blks);
+	}
 	if (!aligned_buf) {
 		info->mssg("Malloc failed for: CHUNK_TYPE_RAW", response);
 		return -ENOMEM;
@@ -228,11 +235,14 @@ int write_sparse_image(struct sparse_storage *info,
 				return -1;
 			}
 
-			fill_buf = (uint32_t *)
-				   memalign(ARCH_DMA_MINALIGN,
-					    ROUNDUP(
-						info->blksz * fill_buf_num_blks,
-						ARCH_DMA_MINALIGN));
+			size_t align = info->blksz;
+
+			if (align < ARCH_DMA_MINALIGN)
+				align = ARCH_DMA_MINALIGN;
+
+			fill_buf = (uint32_t *)memalign(
+				align,
+				ROUNDUP(info->blksz * fill_buf_num_blks, align));
 			if (!fill_buf) {
 				info->mssg("Malloc failed for: CHUNK_TYPE_FILL",
 					   response);

@@ -14,6 +14,7 @@
 #include <memalign.h>
 #include <dm.h>
 #include <linux/delay.h>
+#include <linux/kernel.h>
 #include <asm/arch/rtkemmc.h>
 #include <asm/arch/platform_lib/board/gpio.h>
 #include <asm/arch/rbus/crt_reg.h>
@@ -526,11 +527,18 @@ void make_ip_des(UINT32 dma_addr, UINT32 dma_length)
 		}
 
 		//boundary check
-		b1 = dma_addr / 0x8000000;              //this eMMC ip dma transfer has 128MB limitation
-		b2 = (dma_addr+blk_cnt2*512) / 0x8000000;
-		if(b1 != b2) {
-			blk_cnt2 = (b2*0x8000000-dma_addr) / 512;
+		b1 = dma_addr / EMMC_SEG_BOUNDARY;              //this eMMC ip dma transfer has 128MB limitation
+		b2 = (dma_addr + blk_cnt2 * EMMC_BLK_SIZE) / EMMC_SEG_BOUNDARY;
+		if (b1 != b2) {
+			u32 seg_space = EMMC_SEG_BOUNDARY -
+					(dma_addr & EMMC_SEG_BOUNDARY_MASK);
+
+			blk_cnt2 = DIV_ROUND_UP(seg_space, EMMC_BLK_SIZE);
+			blk_cnt2 = min_t(u32, blk_cnt2, remain_blk_cnt);
 		}
+
+		if (!blk_cnt2)
+			blk_cnt2 = 1;
 
 		if(dma_length<512) tmp_val = ((dma_length)<<16)|0x21;
 		else tmp_val = ((blk_cnt2&0x7f)<<25)|0x21;
