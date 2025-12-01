@@ -248,13 +248,13 @@ int misc_init_r(void)
 		board_name = "#" CONFIG_BOARD_FIT_CONFIG_NAME;
 #endif
 	env_set("bootcfg", board_name);
-#if CONFIG_IS_ENABLED(USB_STORAGE)
+#if CONFIG_IS_ENABLED(FASTBOOT)
 #if CONFIG_USB_BOOT_GPIO_NUM
 	setISOGPIO_pullsel(CONFIG_USB_BOOT_GPIO_NUM, PULL_UP);
 	if (!getISOGPIO(CONFIG_USB_BOOT_GPIO_NUM))
 #endif
-	env_set("boot_usb", "1");
-#endif /* USB_STORAGE */
+	env_set("btn_pressed", "1");
+#endif /* FASTBOOT */
 
 	if(gd->fdt_blob) {
 		int noffset1 = fdt_path_offset(gd->fdt_blob, "/"FIT_SIG_NODENAME"/key-prod");
